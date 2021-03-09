@@ -93,12 +93,17 @@ public class GradeBook2D {
 
     //計算每位學生平均，以一維陣列回傳
     public double[] getStuAverages() {
+        double [] averages;
+        averages = new double [grades.length];
         for (int i = 0; i < grades.length; i++) {
             int total = 0;
+            
             for (int j = 0; j < grades[i].length; j++) {
                 total = total + grades[i][j];
+                //System.out.printf("---%d---%d = %d + %d\n",j,total,total,grades[i][j]);
             }
             averages[i] = (double) total / grades[i].length;
+            //System.out.printf("---%d---\ntotal : %d\n",i,total);
         }
         return averages;
     }

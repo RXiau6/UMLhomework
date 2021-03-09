@@ -33,8 +33,6 @@ public class FXMLDocumentController implements Initializable {
 
     GradeBook2D grade = new GradeBook2D();
     @FXML
-    private Button read_btn;
-    @FXML
     private Button score_btn;
     @FXML
     private Button stu_btn;
@@ -48,6 +46,10 @@ public class FXMLDocumentController implements Initializable {
     private TextArea result;
     @FXML
     private Button fileChoose_btn;
+    @FXML
+    private Button class_btn1;
+    @FXML
+    private Button class_btn2;
     
     public void openFile(File fileName){
         Scanner input ;
@@ -100,30 +102,64 @@ public class FXMLDocumentController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
     }    
 
-    @FXML
-    private void readScore(ActionEvent event) {
-        System.out.print(grade.outputGrades());
-//    result.appendText(grade.outputGrades());
-    }
 
     @FXML
     private void printScore(ActionEvent event) {
+        try{
+        result.setText(grade.outputGrades());
+        }catch (Exception ex){
+            result.setText("ERROR\nERROR MESSANGE : "+ex);
+        }
     }
 
     @FXML
     private void countStu(ActionEvent event) {
+        try {
+            int stu = grade.getNumberOfStudent();
+            String ans = String.format("共%3d位考生",stu);
+            result.setText(ans);
+        }catch (Exception ex){
+            result.setText("ERROR\nERROR MESSANGE : "+ex);
+        }
     }
 
     @FXML
     private void countExam(ActionEvent event) {
+        try {
+            int examCount = grade.getNumberOfScore();
+            String ans = String.format("共%3d次考試", examCount);
+            result.setText(ans);
+        }catch (Exception ex){
+            result.setText(("ERROR\nERROR MESSANGE : "+ex));
+        }
     }
 
     @FXML
     private void accPersonalAvg(ActionEvent event) {
+        try{
+            result.setText("");
+            double [] stuAvg;
+            stuAvg = new double [grades.length];
+            stuAvg = grade.getStuAverages();
+            for (int i=0;i<stuAvg[i];i++){
+                String ans = String.format("%s的平均成績為%f\n",names[i],stuAvg[i]);
+                result.appendText(ans);
+            }
+            
+        }catch(Exception ex){
+            System.out.print(ex);
+        }
     }
 
     @FXML
     private void accClassAvg(ActionEvent event) {
+        double classAvg = grade.get_classAvg();
+        String ans = String.format("班級平均為%f",classAvg);
+        try {
+            result.setText(ans);
+        }catch (Exception ex){
+            result.setText("ERROR\n ERROR MESSANGE : "+ex);
+        }
     }
 
     @FXML
@@ -140,6 +176,28 @@ public class FXMLDocumentController implements Initializable {
             return;
         }
         
+    }
+
+    @FXML
+    private void Failcount(ActionEvent event) {
+        int fail = grade.getFailed();
+        String ans = String.format ("不及格人數為%d",fail);
+        try {
+            result.setText(ans);
+        }catch (Exception ex){
+            result.setText("ERROR\nERROR MESSANGE");
+        }
+    }
+
+    @FXML
+    private void get_lowest(ActionEvent event) {
+        int lowest = grade.getMinimum();
+        String ans = String.format("最低分為%d",lowest);
+        try {
+            result.setText(ans);
+        } catch (Exception ex){
+            result.setText("ERROR\nERROR MESSANGE : "+ex);
+        }
     }
     
 }
