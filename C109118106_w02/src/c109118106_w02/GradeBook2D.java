@@ -62,6 +62,7 @@ public class GradeBook2D {
 
         for (int grade : setOfGrades) {
             total += grade;
+            System.out.printf("---%d ,%d",total,grade);
         }
         return (double) total / setOfGrades.length;
     }
@@ -77,6 +78,59 @@ public class GradeBook2D {
         }
 
         return lowGrade;
+    }
+    
+     public int getMaximum() {
+        int hiGrade = grades[0][0];
+        for (int[] studentGrades : grades) {
+            for (int grade : studentGrades) {
+                if (grade > hiGrade) {
+                    hiGrade = grade;
+                }
+            }
+        }
+
+        return hiGrade;
+    }
+    public double[] getPersonHigh() {
+        
+        double [] high;
+        high = new double [grades.length];
+        for (int i = 0; i < grades.length; i++) {
+            int hi_temp = 0;
+            
+            for (int j = 0; j < grades[i].length; j++) {
+                if (grades[i][j]>hi_temp){
+                    hi_temp = grades[i][j];
+                }else {
+                    continue;
+                }
+                //System.out.printf("---%d---%d = %d + %d\n",j,total,total,grades[i][j]);
+            }
+            high[i]=hi_temp;
+            //System.out.printf("---%d---\ntotal : %d\n",i,total);
+        }
+        return high;
+    }
+    public double[] getPersonLow() {
+        
+        double [] low;
+        low = new double [grades.length];
+        for (int i = 0; i < grades.length; i++) {
+            int lo_temp = 100;
+            
+            for (int j = 0; j < grades[i].length; j++) {
+                if (grades[i][j]<lo_temp){
+                    lo_temp = grades[i][j];
+                }else {
+                    continue;
+                }
+                //System.out.printf("---%d---%d = %d + %d\n",j,total,total,grades[i][j]);
+            }
+            low[i]=lo_temp;
+            //System.out.printf("---%d---\ntotal : %d\n",i,total);
+        }
+        return low;
     }
 
     public int getFailed() {

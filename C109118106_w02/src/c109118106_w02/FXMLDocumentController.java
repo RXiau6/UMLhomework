@@ -50,6 +50,14 @@ public class FXMLDocumentController implements Initializable {
     private Button class_btn1;
     @FXML
     private Button class_btn2;
+    @FXML
+    private Button class_btn21;
+    @FXML
+    private Button class_btn211;
+    @FXML
+    private Button class_btn212;
+    @FXML
+    private Button class_btn2121;
     
     public void openFile(File fileName){
         Scanner input ;
@@ -195,6 +203,73 @@ public class FXMLDocumentController implements Initializable {
         String ans = String.format("最低分為%d",lowest);
         try {
             result.setText(ans);
+        } catch (Exception ex){
+            result.setText("ERROR\nERROR MESSANGE : "+ex);
+        }
+    }
+
+    @FXML
+    private void get_highest(ActionEvent event) {
+        int high = grade.getMaximum();
+        String ans = String.format("最高分為%d",high);
+        try {
+            result.setText(ans);
+        } catch (Exception ex){
+            result.setText("ERROR\nERROR MESSANGE : "+ex);
+        }
+    }
+
+    @FXML
+    private void get_personHi(ActionEvent event) {
+        try{
+            result.setText("");
+            double [] stuHi;
+            stuHi = new double [grades.length];
+            stuHi = grade.getPersonHigh();
+            for (int i=0;i<stuHi.length;i++){
+                String ans = String.format("%s的最高成績為%f\n",names[i],stuHi[i]);
+                result.appendText(ans);
+            }
+            
+        }catch(Exception ex){
+            System.out.print(ex);
+        }
+    }
+
+    @FXML
+    private void get_personLo(ActionEvent event) {
+        try{
+            result.setText("");
+            double [] stuLo;
+            stuLo = new double [grades.length];
+            stuLo = grade.getPersonLow();
+            for (int i=0;i<stuLo.length;i++){
+                String ans = String.format("%s的最低成績為%f\n",names[i],stuLo[i]);
+                result.appendText(ans);
+            }
+            
+        }catch(Exception ex){
+            System.out.print(ex);
+        }
+    }
+
+    @FXML
+    private void get_examAvg(ActionEvent event) {
+        double [] examAvg;
+        int [] grade_temp;
+        examAvg =  new double [grades[0].length];
+        for (int i=0;i<examAvg.length;i++){
+            grade_temp=new int [grades[i].length];
+            for (int j=0;j<grades[i].length;j++){
+                grade_temp[j] =  grades[i][j];
+            }
+            examAvg[i]=grade.getAvg(grade_temp);
+        }
+        try{
+            for (int i=0;i<examAvg.length;i++){
+                String ans = String.format("第%d次考試平均為%f\n",i+1,examAvg[i]);
+                result.appendText(ans);
+            }
         } catch (Exception ex){
             result.setText("ERROR\nERROR MESSANGE : "+ex);
         }
