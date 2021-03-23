@@ -21,7 +21,7 @@ public class CheckingAccount extends Account {
     public void debit(double amount) {
         super.debit(amount);
         System.out.printf("已扣款%4f元，剩餘%4f元\n",amount,super.getBalance());
-        if(balance<0){
+        if(super.getBalance()<0){
             System.out.println("已透支，請注意消費");
         }
     }

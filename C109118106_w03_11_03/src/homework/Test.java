@@ -22,13 +22,13 @@ public class Test {
         CheckingAccount ckac = new CheckingAccount(1000);
         SavingsAccount svac = new SavingsAccount(1000);
         System.out.println("------支票帳戶測試------");
-        System.out.println(ckac.getBalance());
+        System.out.println("餘額:"+ckac.getBalance());
         ckac.debit(10000);
-        System.out.println(ckac.getBalance());
+        System.out.println("餘額:"+ckac.getBalance());
         System.out.println("------儲蓄帳戶測試------");
-        System.out.println(svac.getBalance());
+        System.out.println("餘額:"+svac.getBalance());
         svac.debit(10000);
-        System.out.println(svac.getBalance());
+        System.out.println("餘額:"+svac.getBalance());
     }
 
 }
