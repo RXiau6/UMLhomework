@@ -16,7 +16,7 @@ public class test {
      */
     public static void main(String[] args) {
         Moveable r = new Mammal();
-        r.move();
+        //r.eat();
         
         Animal a = new Human();
         Moveable m =a;
