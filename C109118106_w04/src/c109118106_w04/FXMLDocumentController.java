@@ -7,6 +7,7 @@ package c109118106_w04;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -17,6 +18,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import models.Order;
+import models.Ob_List;
 
 /**
  *
@@ -32,7 +35,7 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private ImageView item_image;
     @FXML
-    private ComboBox<?> quantity;
+    private ComboBox<String> quantity;
     @FXML
     private TableColumn<?, ?> order_item_name;
     @FXML
@@ -53,11 +56,16 @@ public class FXMLDocumentController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        
+        for (int i=1;i<=10;i++){
+            String num = String.format("%02d",i);
+            quantity.getItems().addAll(num);
+        }
     }    
 
     @FXML
     private void addto_cart(ActionEvent event) {
+        Ob_List.add_to_cart(item_id, 0, order_list);
     }
 
     @FXML

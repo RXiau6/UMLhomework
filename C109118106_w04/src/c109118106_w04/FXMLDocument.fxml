@@ -118,7 +118,7 @@
                                                                 <Font size="18.0" /> 
                                                             </font> 
                                                         </Label>
-                                          <Button layoutX="38.0" layoutY="31.0" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-border-color: none; -fx-focus-color: none; -fx-border-width: 0;">
+                                          <Button fx:id="btn_kiwi" layoutX="38.0" layoutY="31.0" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-border-color: none; -fx-focus-color: none; -fx-border-width: 0;">
                                              <graphic> 
                                                               <ImageView fitHeight="94.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" style="-fx-focus-color: none;">
                                                    <image>
