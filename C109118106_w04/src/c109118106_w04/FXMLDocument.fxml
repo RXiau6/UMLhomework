@@ -46,7 +46,7 @@
                                 </Label> 
                                 <ImageView fx:id="item_image" fitHeight="152.0" fitWidth="212.0" layoutX="49.0" layoutY="52.0" pickOnBounds="true" preserveRatio="true"> 
                                     <image> 
-                                        <Image url="@../../imgs/kiwi.png" /> 
+                                        <Image url="@../imgs/kiwi.png" /> 
                                     </image> 
                                 </ImageView> 
                                 <ComboBox fx:id="quantity" layoutX="38.0" layoutY="215.0" prefWidth="107.0" styleClass="default" /> 
@@ -59,7 +59,7 @@
                         </AnchorPane> 
                         <AnchorPane prefHeight="286.0" prefWidth="320.0"> 
                             <children> 
-                                <TableView fx:id="table" prefHeight="250.0" prefWidth="320.0"> 
+                                <TableView fx:id="cart" layoutX="-6.0" prefHeight="250.0" prefWidth="320.0"> 
                                     <columns> 
                                         <TableColumn fx:id="order_item_name" prefWidth="75.0" text="品名" /> 
                                         <TableColumn fx:id="order_item_price" prefWidth="75.0" text="單價" /> 
@@ -117,12 +117,16 @@
                                                             <font> 
                                                                 <Font size="18.0" /> 
                                                             </font> 
-                                                        </Label> 
-                                                        <ImageView fitHeight="94.0" fitWidth="150.0" layoutX="45.0" layoutY="44.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@../../imgs/kiwi.png" />
-                                             </image> 
-                                                        </ImageView> 
+                                                        </Label>
+                                          <Button layoutX="38.0" layoutY="31.0" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-border-color: none; -fx-focus-color: none; -fx-border-width: 0;">
+                                             <graphic> 
+                                                              <ImageView fitHeight="94.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" style="-fx-focus-color: none;">
+                                                   <image>
+                                                      <Image url="@../imgs/kiwi.png" />
+                                                   </image> 
+                                                              </ImageView>
+                                             </graphic>
+                                          </Button> 
                                                     </children> 
                                                 </AnchorPane> 
                                                 <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background- radius: 25; -fx-background-color: #FFFFCE;" GridPane.columnIndex="1"> 
@@ -139,7 +143,7 @@
                                                         </Label> 
                                                         <ImageView fitHeight="94.0" fitWidth="150.0" layoutX="45.0" layoutY="44.0" pickOnBounds="true" preserveRatio="true"> 
                                                             <image> 
-                                                                <Image url="@../../imgs/grapes.png" /> 
+                                                                <Image url="@../imgs/grapes.png" /> 
                                                             </image> 
                                                         </ImageView> 
                                                     </children> 

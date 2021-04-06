@@ -34,8 +34,6 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private ComboBox<?> quantity;
     @FXML
-    private TableView<?> table;
-    @FXML
     private TableColumn<?, ?> order_item_name;
     @FXML
     private TableColumn<?, ?> order_item_price;
@@ -45,6 +43,8 @@ public class FXMLDocumentController implements Initializable {
     private TextArea display;
     @FXML
     private AnchorPane menuPane;
+    @FXML
+    private TableView<?> cart;
     
     private void handleButtonAction(ActionEvent event) {
         System.out.println("You clicked me!");
