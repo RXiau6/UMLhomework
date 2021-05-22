@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <title>C109118106_hw #1</title>
+  </head>
+
+  <body>
+    <div class="container">
+      <div th:insert="fragments/navbar :: top-menu"></div>
+      <h1>健康基本資料填寫</h1>
+      <label>請填寫以下資料</label>
+
+      <div class="row">
+        <!-- column for card -->
+        <div class="col-lg-6 mb-5">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="h6 text-uppercase mb-0">健康資訊</h3>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label>姓名:</label>
+
+                <input
+                  class="form-control"
+                  type="text"
+                  name="name"
+                  value="李大同"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <div>
+                  <label>性別:</label>
+                  <input type="radio" name="gender" value="male" checked />
+                  <label>男性</label>
+                  <input type="radio" name="gender" value="female" />
+                  <label>女性</label>
+                </div>
+
+                <div class="form-group">
+                  <label>學制:</label>
+                  <select class="form-control" name="program" id="program">
+                    <option value="大學部" selected>大學部</option>
+                    <option value="碩士班">碩士班</option>
+                    <option value="博士班">博士班</option>
+                  </select>
+                </div>
+                <label>身高:</label>
+                <input
+                  class="form-control"
+                  name="height"
+                  type="text"
+                  value="175"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>體重:</label>
+                <input
+                  class="form-control"
+                  name="weight"
+                  type="text"
+                  value="68"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label>特殊健康狀況描述:</label>
+                <textarea
+                  class="form-control"
+                  name="health"
+                  rows="2"
+                ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label>Email:</label>
+                <input class="form-control" name="email" type="text" required />
+              </div>
+              <div class="form-group">
+                <button type="button" class="btn btn-success btn-sm btn-block">
+                  送出資料(button按鈕)
+                </button>
+              </div>
+
+              <div>
+                <button type="button" class="btn btn-primary btn-sm btn-block">
+                  送出資料(submit)
+                </button>
+              </div>
+            </div>
+            <!-- card body-->
+          </div>
+          <!-- end of card -->
+        </div>
+        <!-- end of card column -->
+        <!-- column for card -->
+      </div>
+      <!-- row -->
+    </div>
+    <!-- container -->
+  </body>
+</html>
+
+<!-- Your Javascript codes -->
+<script>
+  // 寫你的JS程式在此!
+</script>
