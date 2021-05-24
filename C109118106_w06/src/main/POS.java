@@ -1,295 +1,409 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package main;
+package fxtest;
 
-
-
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 import java.util.TreeMap;
-import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import javafx.util.converter.IntegerStringConverter;
 import models.Order;
+import models.OrderDAO;
+import models.OrderDetail;
 import models.Product;
+import models.ProductDAO;
 
+public class asd implements Initializable {
 
-
-/**
- *
- * @author rxiau6-PC
- */
-public class POS extends Application {
-
-    //ObservableList    order_list有新增或刪除都會處動table的更新，也就是發生任何改變時都被通知
-    private ObservableList<Order> order_list;
-    //顯示訂單詳情表格
-    private TableView table;
-
-    //顯示訂單詳情表格
-    private TextArea display;
-    GridPane menu;
-
-    //根容器 所有的元件都放在裡面container，最後再放進布景中scene，布景再放進舞台中stage
-    VBox root;
+    //放置飲料選單的窗格/視窗
+    @FXML
+    private AnchorPane menuPane;
 
     //放所有產品  產品編號  產品物件
     private final TreeMap<String, Product> product_dict = new TreeMap();
-    String[][] product_array = {
-        {"p-j-101", "果汁", "奇異果汁", "70", "kiwi.png", "紐西蘭特選，酸甜的口味，令人忍不住再喝一口"},
-        {"p-j-102", "果汁", "椰子汁", "80", "coconut.png", "產品描述"},
-        {"p-j-103", "果汁", "水蜜桃汁", "90", "peach.png", "產品描述"},
-        {"p-j-104", "果汁", "葡萄汁", "100", "grapes.png", "產品描述"},
-        {"p-j-105", "果汁", "草莓汁", "100", "strawberry.png", "產品描述"},
-        {"p-j-106", "果汁", "芒果汁", "100", "mango.png", "產品描述"},
-        {"p-j-107", "果汁", "櫻桃汁", "120", "cherry.png", "產品描述"},
-        {"p-j-108", "果汁", "香蕉汁", "75", "banana.png", "產品描述"},
-        {"p-j-109", "果汁", "橘子汁", "65", "orange.png", "產品描述"},
-        {"p-j-110", "果汁", "西瓜汁", "60", "watermelon.png", "產品描述"},
-        {"p-t-112", "茶飲", "紅茶", "45", "blacktea.jpg", "產品描述"},
-        {"p-t-113", "茶飲", "綠茶", "45", "greentea.jpg", "產品描述"},
-        {"p-t-114", "茶飲", "珍珠奶茶", "50", "perlmilktea.jpg", "產品描述"}
-    };
+   
+    //置放訂單明細項目，也是給表格顯示的資料項目
+    ObservableList<OrderDetail> order_list;
 
+    //點選的產品，當把產品放入購物籃會用到
+    private Product selectedItem;
+
+    //顯示點選到的產品名稱價格圖片
+    @FXML
+    private Label item_name;
+    @FXML
+    private Label item_price;
+    @FXML
+    private ImageView item_image;
+
+    //買幾杯
+    @FXML
+    private ComboBox<String> quantity;
+
+    //顯示訂單內容的表格 裡面存放的是OrderDetail訂單細節項目
+    @FXML
+    private TableView<OrderDetail> table;
+
+    //顯示訂單總金額
+    @FXML
+    private TextArea display;
+
+    //***********產生資料DAO來使用
+    ProductDAO productDao = new ProductDAO();
+    OrderDAO orderDao = new OrderDAO();
+
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        //讀產品 從資料庫中讀入
+        prepareProduct();
+        
+        //將所有可視元件初始化布置好，事件也準備好
+        initMyComponents();
+    }
+
+    //準備產品的字典 從資料庫中讀入
     private void prepareProduct() {
 
-        //read_product_from_file(); //從檔案或資料庫讀入產品菜單資訊
-        for (int i = 0; i < product_array.length; i++) {
-            Product product = new Product(
-                    product_array[i][0],
-                    product_array[i][1],
-                    product_array[i][2],
-                    Integer.parseInt(product_array[i][3]),
-                    product_array[i][4],
-                    product_array[i][5]);
+        //***************從檔案或資料庫讀入產品菜單資訊
+        List<Product> products = productDao.getAllProducts();
 
-            product_dict.put(product.getId(), product);
+        //放入product_dict中點選產品與顯示產品比較方便
+        for (Product product : products) {
+            System.out.println(product.getCategory());
+            product_dict.put(product.getProduct_id(), product);
         }
 
     }
 
-    private void prepareProductMenu() {
+    //初始化元件
+    public void initMyComponents() {
 
-        int row = 0;
-        int col = 0;
+        //數量combobox
+        quantity.getItems().setAll("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
+        quantity.getSelectionModel().select(1);
+        selectedItem = product_dict.firstEntry().getValue();
 
-        menu = new GridPane();
-        menu.setVgap(10);
-        menu.setHgap(10);
+        //ObservableList    order_list有新增或刪除都會處動table的更新，也就是發生任何改變時都被通知
+        order_list = FXCollections.observableArrayList();
 
-        for (String item_id : product_dict.keySet()) {
+        //表格table塞入三個欄位
+        TableColumn<OrderDetail, String> order_item_name = new TableColumn("品名");
+        order_item_name.setCellValueFactory(new PropertyValueFactory("product_name"));
 
-            //定義新增一筆按鈕
-            Button btn = new Button();
-            btn.setPrefSize(180, 100);
-            //btn.setText(product_dict.get(item_id).getName());
+        TableColumn<OrderDetail, Integer> order_item_price = new TableColumn<>("價格");
+        order_item_price.setCellValueFactory(new PropertyValueFactory<>("product_price"));
 
-            //Creating a graphic (image)
-            Image img = new Image("/imgs/" + product_dict.get(item_id).getImgSrc());
-            ImageView view = new ImageView(img);
-            view.setFitHeight(100);
-            view.setPreserveRatio(true);
-            //Setting a graphic to the button
-            btn.setGraphic(view);
+        TableColumn order_item_qty = new TableColumn<>("數量");
+        order_item_qty.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        order_item_qty.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
 
+        table.setEditable(true);
 
-            btn.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    //新增一筆
-                    //order_list.add(new Order("p-109", "新增的果汁", 30, 1));
-                    //System.out.println("add a row");
-                    addToCart(item_id);
-                    check();
-                }
-            });
+        table.getColumns().addAll(order_item_name, order_item_price, order_item_qty);
 
-            if (col == 5) {
-                col = 0;
-                row++;
+        order_item_qty.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent event) {
+
+                //印出細節內容看看裡面的內容是甚麼
+                //System.out.println(event.getTablePosition());
+                //System.out.println(event.getTablePosition().getRow());
+                //System.out.println(((Order)event.getTableView().getItems().get(event.getTablePosition().getRow())).getQty());
+                //System.out.println(event.getTableView().getItems().get(event.getTablePosition().getRow()));
+                int new_val = (Integer) event.getNewValue();
+                int row_num = event.getTablePosition().getRow();
+                OrderDetail target = (OrderDetail) event.getTableView().getItems().get(row_num);
+
+                //
+                System.out.println(new_val);
+                target.setQuantity(new_val);
+
+                System.out.println(order_list.get(row_num).getQuantity());
+                check_total();
+                //顯示總金額於display
+                String totalmsg = String.format("%s %d\n", "總金額:", check_total());
+                display.setText(totalmsg);
             }
-            menu.add(btn, col, row);
-            col++;
-        }
+        });
+
+        //表格最後一欄是空白，不要顯示!
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setPrefHeight(250);
+
+        table.setItems(order_list);
+
+        //把果汁菜單填入產品窗格
+        menuPane.getChildren().clear();
+        menuPane.getChildren().add(getCategoryMenu("果汁"));
+
+        System.out.println("OK");
 
     }
 
-    //計算總金額
-    public void check() {
-        double total = 0;
-        //將所有的訂單顯示在表格   計算總金額
-        for (Order od : order_list) {
-            //加總
-            total += od.getPrice() * od.getQty();
+    //取得飲料種類的菜單:引數是--果汁 茶飲 咖啡
+    public GridPane getCategoryMenu(String category) {
+
+        //準備一個格子窗格
+        GridPane menuGrid = new GridPane();
+        menuGrid.setHgap(10); //設定間隔距離
+        menuGrid.setVgap(10);
+
+        int column = 0;
+        int row = 0;
+
+        for (String prod_id : product_dict.keySet()) {
+
+            System.out.println("prod_id:" + prod_id);
+            System.out.println(product_dict.get(prod_id).getCategory());
+
+            if (product_dict.get(prod_id).getCategory().equals(category)) {
+
+                AnchorPane productPane = getProductItemPane(product_dict.get(prod_id));
+
+                //置放3個行(欄)
+                if (column == 3) {
+                    column = 0;
+                    row++; //3行放完才換下一個列
+                }
+                menuGrid.add(productPane, column++, row); // (0,0)  (1,0)  (2,0)前面是行編號後面是列編號 <--第0個row
+            }
         }
 
-        //顯示總金額於display
-        String totalmsg = String.format("%s %d\n", "總金額:", Math.round(total));
-        display.setText(totalmsg);
+        //ScrollPane scrollPane = new ScrollPane(new AnchorPane(menuGrid));
+        //scrollPane.setStyle("-fx-background-color:transparent;");
+        //return menuPane;
+        //return scrollPane;
+        return menuGrid;
 
     }
 
-    //加入購物車 檢查是否有重複的飲料
-    public void addToCart(String item_id) {
+    //這是產品菜單的小窗格 每個產品有一個專屬的窗格物件
+    public AnchorPane getProductItemPane(Product product) {
 
+        //準備一個茅點窗格
+        AnchorPane itemPane = new AnchorPane();
+
+        String css
+                = "-fx-background-color: #FFF0AC;"
+                + " -fx-background-radius: 25;"
+                + "-fx-font-size: 20px;";
+
+        itemPane.setStyle(css); //套用樣式
+
+        //顯示產品名稱與價格
+        Label nameLabel = new Label(product.getName());
+        Label priceLabel = new Label("$" + product.getPrice());
+
+        HBox hb_name_price = new HBox();
+        hb_name_price.setAlignment(Pos.CENTER);
+        hb_name_price.setSpacing(10);
+        hb_name_price.getChildren().addAll(nameLabel, priceLabel);
+
+        //放圖片
+        ImageView image = new ImageView();
+        image.setFitWidth(150);
+        image.setFitHeight(100);
+
+        //幾種讀圖檔的方法   Stream是InputStream輸入串流
+        Image img = new Image(getClass().getResourceAsStream("/imgs/" + product.getPhoto()));
+        //Image image = new Image(getClass().getResource("/imgs/" + product.getImgSrc()).toString());
+        //Image image = new Image("/imgs/" +product.getImgSrc()); //不建議
+
+        image.setImage(img);
+
+        VBox vbox_product = new VBox();
+        vbox_product.getChildren().addAll(hb_name_price, image);
+        vbox_product.setPadding(new Insets(10, 10, 10, 10));
+        vbox_product.setMaxWidth(150);
+
+        itemPane.getChildren().addAll(vbox_product);
+
+        //定義滑鼠事件mouse event滑鼠點下去
+        itemPane.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                selectedItem = product; //放入購物籃會用到
+                showSelectedItem(product);
+            }
+        });
+
+        return itemPane;
+    }
+
+    public void showSelectedItem(Product product) {
+        //顯示產品名稱價格與圖片
+        item_name.setText(product.getName());
+        item_price.setText("$" + product.getPrice());
+        Image image = new Image(getClass().getResource("/imgs/" + product.getPhoto()).toString());
+        item_image.setImage(image);
+
+        //數量設定為1個
+        quantity.getSelectionModel().select(1);
+    }
+
+    @FXML
+    private void add_to_cart(ActionEvent event) {
+
+        String prod_id = selectedItem.getProduct_id();
+        System.out.println(prod_id); //印出看看哪個產品加入購物車
+
+        //拿到訂購數量幾杯?
+        int qty = Integer.parseInt(quantity.getSelectionModel().getSelectedItem());
+        System.out.println(qty);
+
+        //檢查購物車內是否有這項產品
         boolean duplication = false;
-        for (Order ord : order_list) {
-            if (ord.getId().equals(item_id)) {
+        
+        for (OrderDetail od : order_list) {
+            if (od.getProduct_id().equals(prod_id)) {
                 duplication = true;
             }
         }
 
         if (duplication) {
-            System.out.println(item_id + "已經加入購物車");
+            System.out.println(prod_id + "已經加入購物車");
         } else {
-            Order new_ord = new Order(
-                    item_id,
-                    product_dict.get(item_id).getName(),
-                    product_dict.get(item_id).getPrice(),
-                    1);
-            order_list.add(new_ord);
-            System.out.println(item_id);
+            
+            //購物車加入現在點選的品項
+            OrderDetail newOrdd = new OrderDetail();
+            newOrdd.setProduct_id(product_dict.get(prod_id).getProduct_id());
+            newOrdd.setProduct_name(product_dict.get(prod_id).getName());
+            newOrdd.setProduct_price(product_dict.get(prod_id).getPrice());
+            newOrdd.setQuantity(qty);
+            order_list.add(newOrdd);
+            System.out.println(prod_id);
+        }
+
+        //顯示總金額於display
+        String totalmsg = String.format("%s %d\n", "總金額:", check_total());
+        display.setText(totalmsg);
+
+    }
+
+    //計算總金額
+    public int check_total() {
+        double total = 0;
+        //將所有的訂單顯示在表格   計算總金額
+        for (OrderDetail od : order_list) {
+            //加總
+            total += od.getProduct_price() * od.getQuantity();
+        }
+
+        return (int) total;
+
+    }
+
+    //訂單刪除
+    @FXML
+    private void delete_order(ActionEvent event) {
+
+        display.setText("");
+        order_list.clear();
+        //顯示總金額於display
+        String totalmsg = String.format("%s %d\n", "總金額:", check_total());
+        display.setText(totalmsg);
+
+    }
+
+    //結帳*******************這裡寫入訂單明細到資料庫
+    @FXML
+    private void check(ActionEvent event) {
+
+        display.setText("已結帳，發票列印中...\n");
+
+        //append_order_to_csv(); //將這一筆訂單附加儲存到檔案或資料庫
+        //這裡要取得不重複的order_num編號
+        String order_num = orderDao.getMaxOrderNum();
+
+        if (order_num == null) {
+            order_num = "ord-100";
+        }
+
+        System.out.println(order_num);
+        System.out.println(order_num.split("-")[1]);
+        
+        //將現有訂單編號加上1
+        int serial_num = Integer.parseInt(order_num.split("-")[1]) + 1;
+        System.out.println(serial_num);
+
+        //每家公司都有其訂單或產品的編號系統，這裡用ord-xxx表之
+        String new_order_num = "ord-" + serial_num;
+
+        int sum = check_total();
+        //Cart crt = new Cart(new_order_num, "2021-05-01", 123, userName);
+        Order crt = new Order();
+        crt.setOrder_num(new_order_num);
+        crt.setTotal_price(sum);
+        crt.setCustomer_name("無姓名");
+        crt.setCustomer_phtone("無電話");
+        crt.setCustomer_address("無地址");
+
+        
+        //寫入一筆訂單道資料庫
+        orderDao.insertCart(crt);
+
+        //逐筆寫入訂單明細
+        for (int i = 0; i < order_list.size(); i++) {
+            OrderDetail item = new OrderDetail();
+            item.setOrder_num(new_order_num); //設定訂單編號
+            item.setProduct_id(order_list.get(i).getProduct_id()); //設定產品編號
+            item.setQuantity(order_list.get(i).getQuantity());//設定訂購數量 多少杯
+            item.setProduct_price(order_list.get(i).getProduct_price()); //產品單價 建議不要這個欄位 不符合正規化
+            item.setProduct_name(order_list.get(i).getProduct_name());//產品名稱 建議不要這個欄位 不符合正規化
+
+            orderDao.insertOrderDetailItem(item);
+        }
+
+        order_list.clear();
+    }
+
+    //選擇飲料菜單種類
+    @FXML
+    private void select_menu(ActionEvent event) {
+
+        String category = ((Button) event.getSource()).getText();
+
+        menuPane.getChildren().clear();//先刪除原有的窗格再加入新的類別窗格
+        if (category.equals("茶飲")) {
+            menuPane.getChildren().addAll(getCategoryMenu("茶飲"));
+        } else if (category.equals("果汁")) {
+            menuPane.getChildren().addAll(getCategoryMenu("果汁"));
+        } else if (category.equals("咖啡")) {
+            menuPane.getChildren().addAll(getCategoryMenu("咖啡"));
         }
     }
 
-    //初始化所有元件與事件並將所有元件放入root
-    public void initMyComponents() {
-
-        //訂單陣列串列初始化FXCollections類別有很多靜態方法可以操作ObservableList的"訂單陣列串列"
-        order_list = FXCollections.observableArrayList();
-
-        //也可以這樣加入一筆訂單
-        //order_list.add(new Order("p-103", "西瓜汁", 80, 3));
-        // display
-        display = new TextArea();
-
-        //表格初始化
-        table = new TableView();
-        table.setEditable(true); //表格允許修改
-        //表格項目來自於order_list，依據置放順序顯示
-        table.setItems(order_list);
-
-        //table也可以這樣放入訂單
-        //table.getItems().add(new Order("p-104", "奇異果汁", 50, 2));
-        //定義第一個欄位column"品名"，其值來自於Order物件的某個String變數
-        TableColumn<Order, String> order_item_name = new TableColumn("品名");
-        //置放哪個變數值?指定這個欄位放置Order的"name"實例變數值
-        order_item_name.setCellValueFactory(new PropertyValueFactory("name"));
-        //order_item_name.setCellFactory(TextFieldTableCell.forTableColumn());
-        order_item_name.setPrefWidth(100); //設定欄位寬度
-        order_item_name.setMinWidth(100);
-
-        TableColumn<Order, Integer> order_item_price = new TableColumn("價格");
-        order_item_price.setCellValueFactory(new PropertyValueFactory("price"));
-        //order_item_price.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
-
-        TableColumn order_item_qty = new TableColumn("數量");
-        order_item_qty.setCellValueFactory(new PropertyValueFactory("qty"));
-        //這個欄位值內容可以被修改，因為qty是整數，因此須將整數轉為字串
-        order_item_qty.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
-
-        //把3個欄位加入table中
-        table.getColumns().addAll(order_item_name, order_item_price, order_item_qty);
-
-        //表格最後一欄是空白，不要顯示!
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        //定義數量欄位被修改後進行那些動作
-        order_item_qty.setOnEditCommit(new EventHandler<CellEditEvent>() {
-            @Override
-            public void handle(CellEditEvent event) {
-
-                int row_num = event.getTablePosition().getRow();//哪一筆被修改
-                int new_val = (Integer) event.getNewValue(); //改成甚麼數值 需要將物件轉為整數
-                Order target = (Order) event.getTableView().getItems().get(row_num); //取得該筆果汁傳參考呼叫
-                //修改成新的數值 該筆訂單存放於order_list
-                target.setQty(new_val);
-                check();
-                System.out.println(order_list.get(row_num).getQty()); //顯示修改後的數值
-            }
-        });
-
-        //定義新增一筆按鈕
-        Button btn = new Button();
-        btn.setText("新增一筆");
-        btn.getStylesheets().add("/css/bootstrap3.css");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                //新增一筆
-                //order_list.add(new Order("p-109", "新增的果汁", 30, 1));
-                //System.out.println("add a row");
-                addToCart("p-j-104");
-                check();
-            }
-        });
-        //定義刪除一筆按鈕
-        Button btndelete = new Button("刪除一筆");
-        btndelete.getStylesheets().add("/css/bootstrap3.css");
-        btndelete.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                //取得哪一筆該被刪除
-                Object selectedItem = table.getSelectionModel().getSelectedItem();
-                //從表格table中或是從order_list刪除這一筆，擇一進行
-                table.getItems().remove(selectedItem);
-                //order_list.remove(selectedItem);
-                check();
-            }
-        });
-
-        //放置兩個按鈕
-        HBox hb_btn = new HBox();
-        hb_btn.getChildren().addAll(btn, btndelete);
-        hb_btn.setSpacing(10);
-        hb_btn.setAlignment(Pos.CENTER_RIGHT);
-
-        //根節點容器
-        root = new VBox();
-        root.getChildren().addAll(menu, hb_btn, table, display);
-        root.setSpacing(10);
-        root.setPadding(new Insets(10, 10, 10, 10));
-        root.getStylesheets().add("/css/bootstrap3.css");
+    @FXML
+    private void delete_row(ActionEvent event) {
+        Object selectedItem = table.getSelectionModel().getSelectedItem();
+        table.getItems().remove(selectedItem);
+        check_total();
+        //顯示總金額於display
+        String totalmsg = String.format("%s %d\n", "總金額:", check_total());
+        display.setText(totalmsg);
     }
 
-    //建構子
-    public POS() {
-        prepareProduct();
-        prepareProductMenu();
-    }
-
-    @Override
-    public void start(Stage stage) {
-        initMyComponents();
-        Scene scene = new Scene(root);
-        stage.setTitle("表格展示");
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    public static void main(String[] args) {
-        launch(args);
-    }
 }
-

@@ -1,39 +1,88 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package c109118106_w11;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author RXiau6
- */
 public class ProductDAO {
 
-    //在各個方法中在操作資料之前必須先進行取得連線，因為太久沒跟資料庫連線，資料庫會自動斷線，這就出現問題無法進行操作，因此，必須先取得連線。
-    private Connection conn; //連線物件
-
+    //private Connection conn = DBConnection.getConnection();
+    private Connection conn;
+    
+    
     public List<Product> getAllProducts() {
+        
         conn = DBConnection.getConnection();
         String query = "select * from product";
         List<Product> product_list = new ArrayList();
 
         try {
-            PreparedStatement state
+            PreparedStatement ps
                     = conn.prepareStatement(query);
-            ResultSet rset = state.executeQuery();
+            ResultSet rset = ps.executeQuery();
 
             while (rset.next()) {
                 Product product = new Product();
-                product.setId(rset.getString("id"));
+                product.setProduct_id(rset.getString("product_id"));
+                product.setCategory(rset.getString("category"));
+                product.setName(rset.getString("name"));
+                product.setPrice(rset.getInt("price"));
+                product.setPhoto(rset.getString("photo"));
+                product.setDescription(rset.getString("description"));
+                product_list.add(product);
+                
+                //不要斷線，一直會用到，使用持續連線的方式
+               //conn.close();
+            }
+        } catch (SQLException ex) {
+            System.out.println("getAllproducts異常:" + ex.toString());
+        }
+
+        return product_list;
+    }
+
+ 
+    //選擇特定字串"孫大毛"或是"孫%"或是"%毛"
+    public List<Product> findByNameContaining(String name_str) {
+        conn = DBConnection.getConnection();
+        boolean success = false;
+        List<Product> product_list = new ArrayList();
+        //String query = String.format("select * from student where name like '%s%s'", name_str, "%");
+        //String query = String.format("select * from student where name like '%s'", name_str);
+        String query = "select * from product where name like ?";
+        try {
+            PreparedStatement state = conn.prepareStatement(query);
+            state.setString(1, "%"+name_str+"%");
+            ResultSet rset = state.executeQuery();
+            while (rset.next()) {
+                Product product = new Product();
+                product.setProduct_id(rset.getString("product_id"));
+                product.setName(rset.getString("name"));
+                product.setPrice(rset.getInt("price"));
+                product.setPhoto(rset.getString("photo"));
+                product_list.add(product);
+            }
+        } catch (SQLException ex) {
+            System.out.println("資料庫selectByName操作異常:" + ex.toString());
+        }
+        return product_list;
+    }
+
+   public List<Product> findByPriceLessThanEqual(int price) {
+        conn = DBConnection.getConnection();
+        List<Product> product_list = new ArrayList();
+        String query = "select * from product where price <= ?";
+        try {
+            PreparedStatement state = conn.prepareStatement(query);
+            state.setInt(1, price);
+            ResultSet rset = state.executeQuery();
+            while (rset.next()) {
+                Product product = new Product();
+                product.setProduct_id(rset.getString("product_id"));
                 product.setCategory(rset.getString("category"));
                 product.setName(rset.getString("name"));
                 product.setPrice(rset.getInt("price"));
@@ -42,36 +91,95 @@ public class ProductDAO {
                 product_list.add(product);
             }
         } catch (SQLException ex) {
-            System.out.println("getAllproducts異常:" + ex.toString());
+            System.out.println("資料庫selectByPrice作異常:" + ex.toString());
         }
         return product_list;
     }
-
-    public boolean add(Product product) {
+    
+  
+   public List<Product> findByCate(String cate) {
         conn = DBConnection.getConnection();
-        String query = "insert into product(id,category,name,price,photo,description) VALUES (?,?,?,?,?,?)";
+        List<Product> product_list = new ArrayList();
+        String query = "select * from product where category = ?";
+        try {
+            PreparedStatement state = conn.prepareStatement(query);
+            state.setString(1, cate);
+            ResultSet rset = state.executeQuery();
+            while (rset.next()) {
+                Product product = new Product();
+                product.setProduct_id(rset.getString("product_id"));
+                product.setCategory(rset.getString("category"));
+                product.setName(rset.getString("name"));
+                product.setPrice(rset.getInt("price"));
+                product.setPhoto(rset.getString("photo"));
+                product.setDescription(rset.getString("description"));
+                product_list.add(product);
+            }
+        } catch (SQLException ex) {
+            System.out.println("資料庫selectByCate異常:" + ex.toString());
+        }
+        return product_list;
+    }
+    
+    //選擇某個student_id
+    public Product findById(String id) {
+        conn = DBConnection.getConnection();
+        boolean success = false;
+        String query = "select * from product where product_id = ?";
+        //String query = String.format("select * from student where student_id = '%s'", id);
+        Product product = new Product();
+        try {
+            PreparedStatement state = conn.prepareStatement(query);
+            state.setString(1, id);
+            ResultSet rset = state.executeQuery();
+
+            while (rset.next()) {
+                success = true;
+                product.setProduct_id(rset.getString("product_id"));
+                product.setCategory(rset.getString("category"));
+                product.setName(rset.getString("name"));
+                product.setPrice(rset.getInt("price"));
+                product.setPhoto(rset.getString("photo"));
+                product.setDescription(rset.getString("description"));
+            }
+        } catch (SQLException ex) {
+            System.out.println("資料庫selectByID操作異常:" + ex.toString());
+        }
+
+        if (success) {
+            return product;
+        } else {
+            return null;
+        }
+
+    }
+  
+       public boolean insert(Product product) {
+        conn = DBConnection.getConnection();
+        String query = "insert into product(product_id,name,category,price,photo,description) VALUES (?,?,?,?,?,?)";
         boolean success = false;
         try {
             PreparedStatement state = conn.prepareStatement(query);
-            state.setString(1, product.getId());
-            state.setString(2, product.getCategory());
-            state.setString(3, product.getName());
+            state.setString(1, product.getProduct_id());
+            state.setString(2, product.getName());
+            state.setString(3, product.getCategory());
             state.setInt(4, product.getPrice());
             state.setString(5, product.getPhoto());
             state.setString(6, product.getDescription());
 
             state.execute();
-            //state.executeUpdate();
+            state.executeUpdate();
             success = true;
         } catch (SQLException ex) {
-            System.out.println("add異常:" + ex.toString());
+            System.out.println("insert異常:" + ex.toString());
         }
         return success;
-    }
-
+    } 
+    
+       
     public boolean delete(String id) {
         conn = DBConnection.getConnection();
-        String query = "delete from product where id =?";
+        String query = "delete from product where product_id =?";
         boolean sucess = false;
         try {
             PreparedStatement statement = conn.prepareStatement(query);
@@ -91,20 +199,22 @@ public class ProductDAO {
 
     public void update(Product product) {
         conn = DBConnection.getConnection();
-        String query
-                = "update product set name=?, price= ? where id = ?";
+        String query = "update product set name=?, category=?, price=?, photo= ?, description=? where product_id = ?";
         try {
             PreparedStatement state = conn.prepareStatement(query);
+            state.setString(6, product.getProduct_id());
             state.setString(1, product.getName());
-            state.setInt(2, product.getPrice());
-            state.setString(3, product.getId());
+            state.setString(2, product.getCategory());
+            state.setInt(3, product.getPrice());
+            state.setString(4, product.getPhoto());
+            state.setString(5, product.getDescription());
+            
             state.executeUpdate();
         } catch (SQLException ex) {
             System.out.println("update異常:" + ex.toString());
         }
     }
-
-    //選擇特定姓名，輸入正確姓名"孫大毛"或是"孫%"或是"%毛"
+     //選擇特定姓名，輸入正確姓名"孫大毛"或是"孫%"或是"%毛"
     public List<Product> selectByName(String name_str) {
         conn = DBConnection.getConnection();
         boolean success = false;
@@ -119,7 +229,7 @@ public class ProductDAO {
             ResultSet rset = state.executeQuery();
             while (rset.next()) {
                 Product product = new Product();
-                product.setId(rset.getString("id"));
+                product.setProduct_id(rset.getString("product_id"));
                 product.setName(rset.getString("name"));
                 product.setPrice(rset.getInt("price"));
                 product_list.add(product);
@@ -134,17 +244,17 @@ public class ProductDAO {
     public Product selectByID(String id) {
         conn = DBConnection.getConnection();
         boolean success = false;
-        String query = "select * from product where id = ?";
+        String query = "select * from product where product_id = ?";
         //String query = String.format("select * from product where product_id = '%s'", id);
         Product product = new Product();
         try {
             PreparedStatement state = conn.prepareStatement(query);
             state.setString(1, id);
             ResultSet rset = state.executeQuery();
-
             while (rset.next()) {
                 success = true;
-                product.setId(rset.getString("id"));
+
+                product.setProduct_id(rset.getString("product_id"));
                 product.setName(rset.getString("name"));
                 product.setPrice(rset.getInt("price"));
             }
@@ -176,7 +286,7 @@ public class ProductDAO {
             while (rset.next()) {
                 success = true;
 
-                product.setId(rset.getString("product_id"));
+                product.setProduct_id(rset.getString("product_id"));
                 product.setName(rset.getString("name"));
                 product.setPrice(rset.getInt("price"));
                 product_list.add(product);
@@ -192,40 +302,16 @@ public class ProductDAO {
         }
 
     }
-
-    //測試一下
+    
     public static void main(String[] args) {
 
-        ProductDAO prdao = new ProductDAO();
-
-        // add a product record
-            //System.out.println(prdao.add(new Product("p-j-115", "茶飲", "鮮奶茶", 55, "milk_tea.png", "鮮奶茶")));
-        //delete a record
-            //System.out.println(prdao.delete("p-j-115"));
+        ProductDAO dao = new ProductDAO();
 
         // select All
-        System.out.println("product list");
-        
-        List<Product> product_list = prdao.getAllProducts();
+        List<Product> product_list = dao.getAllProducts();
         for (Product product : product_list) {
             System.out.println(product);
         }
-        System.out.println("--------------");
-
-        //new ProductDAO();
-        // add a product record
-            //System.out.println(prdao.add(new Product("p-j-116", "茶飲", "奶茶", 30, "milk_tea.png", "奶茶")));
-
-        // select name
-        List<Product> someProducts;
-        //someProducts= prdao.selectByName("孫%");
-        someProducts = prdao.selectByName("%西瓜汁");
-
-        for (Product product : someProducts) {
-            System.out.println(product);
-        }
-
-        System.out.println(prdao.delete("p-j-116"));
 
     }
 }

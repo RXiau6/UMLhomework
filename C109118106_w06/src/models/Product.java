@@ -10,19 +10,29 @@ package models;
  * @author rxiau6-PC
  */
 public class Product {
+
     private String id;
     private String category;
     private String name;
     private int price;
-    private String imgSrc;
+    private String photo;
     private String description;
-    public Product(String id, String category, String name, int price, String imgSrc, String description) {
+
+    public Product(String id, String category, String name, int price, String photo, String description) {
         this.id = id;
         this.category = category;
         this.name = name;
         this.price = price;
-        this.imgSrc = imgSrc;
+        this.photo = photo;
         this.description = description;
+    }
+    public Product(){
+        
+    }
+
+    public String toString() {
+        return "Product{" + "id=" + id + ",category=" + category + ",name=" + name + ","
+                + "price=" + price + ",photo=" + photo + ",description=" + description + "}";
     }
 
     public String getId() {
@@ -57,12 +67,12 @@ public class Product {
         this.price = price;
     }
 
-    public String getImgSrc() {
-        return imgSrc;
+    public String getPhoto() {
+        return photo;
     }
 
-    public void setImgSrc(String imgSrc) {
-        this.imgSrc = imgSrc;
+    public void setPhoto(String photo) {
+        this.photo = photo;
     }
 
     public String getDescription() {
@@ -72,5 +82,5 @@ public class Product {
     public void setDescription(String description) {
         this.description = description;
     }
-    
+
 }

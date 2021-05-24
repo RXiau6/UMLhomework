@@ -14,7 +14,7 @@ import java.sql.Statement;
  *
  * @author RXiau6
  */
-public class DBConnectionTest {/**
+public class DBConnectionTest {
     public static void main(String[] args) throws SQLException {
 
         //使用帳號與密碼連線到資料庫...
@@ -40,5 +40,5 @@ public class DBConnectionTest {/**
 
         //取得已連線靜態物件connection
         Connection conn4 = DBConnection.getConnection();
-    }**/
+    }
 }

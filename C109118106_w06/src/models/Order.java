@@ -22,7 +22,9 @@ public class Order {
         this.price = price;
         this.qty = qty;
     }
-
+    public Order(){
+        
+    }
 
 
     public String getId() {

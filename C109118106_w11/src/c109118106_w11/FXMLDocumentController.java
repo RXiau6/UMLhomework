@@ -32,6 +32,10 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import c109118106_w11.DBConnection;
 import c109118106_w11.ProductDAO;
 import c109118106_w11.Product;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.image.ImageView;
+import javafx.util.converter.IntegerStringConverter;
 
 /**
  *
@@ -65,11 +69,11 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private TextField queryName;
     @FXML
-    private TableColumn<?, ?> col_price;
+    private TableColumn<Product, Integer> col_price;
     @FXML
-    private TableColumn<?, ?> col_photo;
+    private TableColumn<Product, String> col_photo;
     @FXML
-    private TableColumn<?, ?> col_description;
+    private TableColumn<Product, String> col_description;
     @FXML
     private TableColumn<Product, String> col_category;
 
@@ -81,13 +85,14 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void update(ActionEvent event) {
         Product prod = table_product.getSelectionModel().getSelectedItem();
-        String id = prod.getId();
+        String id = prod.getProduct_id();
         String name = prod.getName();
         int price = prod.getPrice();
         String category = prod.getCategory();
         String photo = prod.getPhoto();
         String description = prod.getDescription();
-        prodao.update(new Product(id, category, name, price, photo, description));
+        Product tmp = new Product(id, category, name, price, photo, description);
+        prodao.update(tmp);
         products = prodao.getAllProducts();
         loadTable();
 
@@ -97,7 +102,7 @@ public class FXMLDocumentController implements Initializable {
     private void delete(ActionEvent event) {
 
         Product prod = table_product.getSelectionModel().getSelectedItem();
-        String id = prod.getId();
+        String id = prod.getProduct_id();
 
         boolean sucess = prodao.delete(id);
         products = prodao.getAllProducts();
@@ -108,13 +113,13 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void insert(ActionEvent event) {
         Product prod = table_product.getSelectionModel().getSelectedItem();
-        String id = prod.getId();
+        String id = prod.getProduct_id();
         String name = prod.getName();
         int price = prod.getPrice();
         String category = prod.getCategory();
         String photo = prod.getPhoto();
         String description = prod.getDescription();
-        prodao.add(new Product(id, category, name, price, photo, description));
+        prodao.insert(new Product(id, category, name, price, photo, description));
         products = prodao.getAllProducts();
         loadTable();
 
@@ -122,14 +127,19 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private void blankRecord(ActionEvent event) {
-        table_product.getItems().add(new Product("p-j-587", "測試類別", "測試", 999, "test.png", "測試介面"));
+        try {
+            Product tmp = new Product("000", "測試類別", "測試", 1, "test.png", "測試介面");
+            table_product.getItems().add(tmp);
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
     }
 
     @FXML
     private void findID(ActionEvent event) {
         products.clear();
         products.add(prodao.selectByID(queryID.getText()));
-
+        //products = prodao.selectByID(queryID.getText());
         loadTable();
 
     }
@@ -158,7 +168,7 @@ public class FXMLDocumentController implements Initializable {
         //表格最後一欄是空白，不要顯示!
         table_product.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         //table_product.setPrefHeight(200);
-        col_id.setCellValueFactory(new PropertyValueFactory<>("id"));
+        col_id.setCellValueFactory(new PropertyValueFactory<>("product_id"));
         col_name.setCellValueFactory(new PropertyValueFactory<>("name"));
         col_price.setCellValueFactory(new PropertyValueFactory<>("price"));
         col_category.setCellValueFactory(new PropertyValueFactory<>("category"));
@@ -193,6 +203,10 @@ public class FXMLDocumentController implements Initializable {
         col_category.setCellFactory(TextFieldTableCell.forTableColumn());
         col_id.setCellFactory(TextFieldTableCell.forTableColumn());
         col_name.setCellFactory(TextFieldTableCell.forTableColumn());
+        col_photo.setCellFactory(TextFieldTableCell.forTableColumn());
+        col_description.setCellFactory(TextFieldTableCell.forTableColumn());
+        col_price.setCellFactory(TextFieldTableCell.<Product, Integer>forTableColumn(new IntegerStringConverter()));
+        //ageColumn.setCellFactory(TextFieldTableCell.<DataModel, Integer>forTableColumn(new IntegerStringConverter()));
 
         //col_price.setCellFactory(TextFieldTableCell.forTableColumn());
         //學生學號欄位若有修改驅動這個方法
@@ -209,7 +223,7 @@ public class FXMLDocumentController implements Initializable {
             public void handle(CellEditEvent<Product, String> event) {
                 //拿到表格中所在的該筆紀錄(是一筆學生物件)
                 Product prod = table_product.getSelectionModel().getSelectedItem();
-                prod.setId(event.getNewValue()); //將該筆學生物件修改成新的值
+                prod.setProduct_id(event.getNewValue()); //將該筆學生物件修改成新的值
             }
         });
 
@@ -228,8 +242,17 @@ public class FXMLDocumentController implements Initializable {
             }
         });
 
-        //學生電話欄位若有修改驅動這個方法
-        /*
+        col_description.setOnEditCommit(new EventHandler<CellEditEvent<Product, String>>() {
+            @Override
+            public void handle(CellEditEvent<Product, String> event) {
+
+                Product prod = table_product.getSelectionModel().getSelectedItem();
+                System.out.println(event.getNewValue());
+                prod.setDescription(event.getNewValue());
+
+            }
+        });
+
         col_photo.setOnEditCommit(new EventHandler<CellEditEvent<Product, String>>() {
             @Override
             public void handle(CellEditEvent<Product, String> event) {
@@ -240,15 +263,28 @@ public class FXMLDocumentController implements Initializable {
 
             }
         });
-         */
+
+        col_price.setOnEditCommit(new EventHandler<CellEditEvent<Product, Integer>>() {
+            @Override
+            public void handle(CellEditEvent<Product, Integer> event) {
+
+                Product prod = table_product.getSelectionModel().getSelectedItem();
+                System.out.println(event.getNewValue());
+                prod.setPrice(event.getNewValue());
+
+            }
+        });
+
     }
 
+    /*
     private void onPriceEditCommit(CellEditEvent<Product, String> event) {
         Product prod = table_product.getSelectionModel().getSelectedItem();
         prod.setPrice(Integer.parseInt(event.getNewValue()));
     }
 
-    @FXML
+     */
+
     private void loadTable() {
         int totalPage = (int) (Math.ceil(products.size() * 1.0 / RowsPerPage));
         pagination.setPageCount(totalPage);
